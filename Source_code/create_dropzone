@@ -1,0 +1,23 @@
+#!/bin/bash
+
+read -p "Enter drop zone folder name: " folder_name
+
+if [ -z "$folder_name" ]; then
+    echo "Error: folder name cannot be empty."
+    exit 1
+fi
+
+dropzone_path="$HOME/$folder_name"
+
+if [ -d "$dropzone_path" ]; then
+    echo "Directory already exists: $dropzone_path"
+else
+    mkdir "$dropzone_path"
+    echo "Created: $dropzone_path"
+fi
+
+chmod o+wx "$dropzone_path"
+chmod +t "$dropzone_path"
+
+echo "Secure drop zone configured."
+ls -ld "$dropzone_path"

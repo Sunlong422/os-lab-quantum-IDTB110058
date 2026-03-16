@@ -1,0 +1,9 @@
+#!/bin/bash
+
+for i in {1..50}
+do
+    /home/g11-thon-sopheaktra/public_api/buy_widget "Bot_$i" 2 &
+done
+
+wait
+echo "Bot swarm finished."

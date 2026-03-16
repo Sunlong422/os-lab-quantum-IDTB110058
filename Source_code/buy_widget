@@ -1,0 +1,44 @@
+#!/bin/bash
+
+INVENTORY_FILE="$HOME/public_api/inventory.txt"
+SALES_LOG="$HOME/public_api/sales.log"
+LOCK_FILE="$HOME/public_api/inventory.lock"
+
+log_transaction() {
+    echo "IDTB110058 SUCCESS $1 bought $2 widgets." >> "$SALES_LOG"
+}
+
+if [ $# -ne 2 ]; then
+    echo "Usage: buy_widget <username> <quantity>"
+    exit 1
+fi
+
+username="$1"
+quantity="$2"
+
+case "$quantity" in
+    ''|*[!0-9]*)
+        echo "Transaction Failed: Quantity must be a positive integer."
+        exit 1
+        ;;
+    0)
+        echo "Transaction Failed: Quantity must be greater than 0."
+        exit 1
+        ;;
+esac
+
+(
+    flock -x 200
+
+    current_inventory=$(cat "$INVENTORY_FILE")
+
+    if [ "$quantity" -le "$current_inventory" ]; then
+        new_inventory=$((current_inventory - quantity))
+        echo "$new_inventory" > "$INVENTORY_FILE"
+        log_transaction "$username" "$quantity"
+        echo "Transaction Successful."
+    else
+        echo "Transaction Failed: Not enough inventory!"
+    fi
+
+) 200>"$LOCK_FILE"

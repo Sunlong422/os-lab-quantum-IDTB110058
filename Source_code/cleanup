@@ -1,0 +1,24 @@
+#!/bin/bash
+
+for file in *
+do
+    if [ -f "$file" ]; then
+        case "$file" in
+            *.*)
+                ext="${file##*.}"
+                ;;
+            *)
+                continue
+                ;;
+        esac
+
+        if [ ! -d "$ext" ]; then
+            mkdir "$ext"
+        fi
+
+        mv "$file" "$ext/"
+    fi
+done
+
+echo "Cleanup complete."
+ls -R
